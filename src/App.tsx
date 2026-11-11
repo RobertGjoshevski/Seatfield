@@ -1,3 +1,5 @@
+import { Viewport2D } from './components/viewport/Viewport2D'
+
 export default function App() {
   return (
     <div className="flex h-screen w-screen flex-col bg-slate-950 text-slate-100">
@@ -6,7 +8,9 @@ export default function App() {
       </header>
       <div className="flex min-h-0 flex-1">
         <aside className="w-14 border-r border-slate-800" />
-        <main className="flex-1" />
+        <main className="min-w-0 flex-1">
+          <Viewport2D />
+        </main>
         <aside className="w-72 border-l border-slate-800" />
       </div>
       <footer className="h-40 border-t border-slate-800" />

@@ -1,7 +1,12 @@
 import { polygonArea } from '../../core/geometry/polygon'
 import { useProjectStore } from '../../store/projectStore'
+import type { PersistenceStatus } from '../../hooks/useProjectPersistence'
 
-export function TopBar() {
+interface TopBarProps {
+  persistenceStatus?: PersistenceStatus
+}
+
+export function TopBar({ persistenceStatus = 'saved' }: TopBarProps) {
   const project = useProjectStore((state) => state.project)
   const roomDraft = useProjectStore((state) => state.roomDraft)
   const viewMode = useProjectStore((state) => state.viewMode)
@@ -41,6 +46,20 @@ export function TopBar() {
           3D
         </button>
       </div>
+      <span
+        data-testid="persistence-status"
+        className={`text-[11px] ${
+          persistenceStatus === 'error' ? 'text-rose-400' : 'text-slate-500'
+        }`}
+      >
+        {persistenceStatus === 'loading'
+          ? 'Loading…'
+          : persistenceStatus === 'saving'
+            ? 'Saving…'
+            : persistenceStatus === 'error'
+              ? 'Save failed'
+              : 'Saved'}
+      </span>
       <button
         className="rounded border border-slate-700 px-3 py-1 text-xs text-slate-300 hover:bg-slate-800"
         onClick={reset}

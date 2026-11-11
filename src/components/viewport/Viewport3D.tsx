@@ -3,6 +3,7 @@ import { Grid, OrbitControls } from '@react-three/drei'
 import { RoomMesh } from './RoomMesh'
 import { SpeakerMesh } from './SpeakerMesh'
 import { ListenerMarker } from './ListenerMarker'
+import { CoveragePlane3D } from './CoveragePlane3D'
 
 export function Viewport3D() {
   return (
@@ -35,6 +36,7 @@ export function Viewport3D() {
           infiniteGrid
         />
         <RoomMesh />
+        <CoveragePlane3D />
         <SpeakerMesh />
         <ListenerMarker />
         <OrbitControls makeDefault target={[2, 2, 1.5]} />

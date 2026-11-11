@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useProjectStore } from '../../store/projectStore'
 import { useSvgViewport } from '../../hooks/useSvgViewport'
+import { CoverageOverlay2D } from './CoverageOverlay2D'
 import { degToRad, snap } from '../../lib/math'
 
 export function Viewport2D() {
@@ -109,6 +110,7 @@ export function Viewport2D() {
           fill="#0b0f14"
         />
         {gridLines}
+        <CoverageOverlay2D />
         {project.room.boundary.length >= 3 && (
           <polygon
             points={roomPoints}

@@ -1,6 +1,7 @@
 import { TopBar } from './components/layout/TopBar'
 import { ToolRail } from './components/layout/ToolRail'
 import { Inspector } from './components/layout/Inspector'
+import { ResultsPanel } from './components/layout/ResultsPanel'
 import { Viewport2D } from './components/viewport/Viewport2D'
 import { Viewport3D } from './components/viewport/Viewport3D'
 import { useCoverage } from './hooks/useCoverage'
@@ -20,7 +21,7 @@ export default function App() {
         </main>
         <Inspector />
       </div>
-      <footer className="h-40 border-t border-slate-800" />
+      <ResultsPanel />
     </div>
   )
 }

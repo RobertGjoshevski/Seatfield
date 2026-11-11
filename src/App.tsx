@@ -3,10 +3,12 @@ import { ToolRail } from './components/layout/ToolRail'
 import { Inspector } from './components/layout/Inspector'
 import { Viewport2D } from './components/viewport/Viewport2D'
 import { Viewport3D } from './components/viewport/Viewport3D'
+import { useCoverage } from './hooks/useCoverage'
 import { useProjectStore } from './store/projectStore'
 
 export default function App() {
   const viewMode = useProjectStore((state) => state.viewMode)
+  useCoverage()
 
   return (
     <div className="flex h-screen w-screen flex-col bg-slate-950 text-slate-100">

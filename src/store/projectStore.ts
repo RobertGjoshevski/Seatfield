@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import type { Listener, Project, Room, Speaker, Tool, Vec2, ViewMode } from '../core/types'
+import type { CoverageGrid } from '../core/geometry/coverage'
 import { isSimplePolygon } from '../core/geometry/polygon'
 
 export function createDefaultProject(): Project {
@@ -25,6 +26,26 @@ export function createDefaultProject(): Project {
   }
 }
 
+export interface CoverageState {
+  status: 'idle' | 'running' | 'ready' | 'error'
+  grid: CoverageGrid | null
+  error: string | null
+  warnings: string[]
+  elapsedMs: number | null
+  requestId: number
+}
+
+export function createCoverageState(): CoverageState {
+  return {
+    status: 'idle',
+    grid: null,
+    error: null,
+    warnings: [],
+    elapsedMs: null,
+    requestId: 0,
+  }
+}
+
 interface ProjectState {
   project: Project
   activeTool: Tool
@@ -33,6 +54,7 @@ interface ProjectState {
   selectedId: string | null
   coverageSpacing: number
   previewNonce: number
+  coverage: CoverageState
   setTool: (tool: Tool) => void
   setViewMode: (mode: ViewMode) => void
   updateRoom: (patch: Partial<Room>) => void
@@ -44,6 +66,15 @@ interface ProjectState {
   setListener: (point: Vec2) => void
   updateListener: (patch: Partial<Listener>) => void
   setCoverageSpacing: (spacing: number) => void
+  beginCoverage: (requestId: number) => void
+  finishCoverage: (
+    requestId: number,
+    grid: CoverageGrid,
+    elapsedMs: number,
+    warnings: string[],
+  ) => void
+  failCoverage: (requestId: number, message: string) => void
+  clearCoverage: () => void
   bumpPreview: () => void
   select: (id: string | null) => void
   replaceProject: (project: Project) => void
@@ -59,6 +90,7 @@ export const useProjectStore = create<ProjectState>()(
     selectedId: null,
     coverageSpacing: 0.25,
     previewNonce: 0,
+    coverage: createCoverageState(),
 
     setTool: (tool) =>
       set((state) => {
@@ -136,6 +168,40 @@ export const useProjectStore = create<ProjectState>()(
         state.coverageSpacing = spacing
       }),
 
+    beginCoverage: (requestId) =>
+      set((state) => {
+        state.coverage.status = 'running'
+        state.coverage.error = null
+        state.coverage.warnings = []
+        state.coverage.elapsedMs = null
+        state.coverage.requestId = requestId
+      }),
+
+    finishCoverage: (requestId, grid, elapsedMs, warnings) =>
+      set((state) => {
+        if (requestId !== state.coverage.requestId) return
+        state.coverage.status = 'ready'
+        state.coverage.grid = grid
+        state.coverage.error = null
+        state.coverage.warnings = warnings
+        state.coverage.elapsedMs = elapsedMs
+      }),
+
+    failCoverage: (requestId, message) =>
+      set((state) => {
+        if (requestId !== state.coverage.requestId) return
+        state.coverage.status = 'error'
+        state.coverage.grid = null
+        state.coverage.error = message
+        state.coverage.warnings = []
+        state.coverage.elapsedMs = null
+      }),
+
+    clearCoverage: () =>
+      set((state) => {
+        state.coverage = createCoverageState()
+      }),
+
     bumpPreview: () =>
       set((state) => {
         state.previewNonce += 1
@@ -153,6 +219,7 @@ export const useProjectStore = create<ProjectState>()(
         state.viewMode = '2d'
         state.roomDraft = []
         state.selectedId = null
+        state.coverage = createCoverageState()
       }),
 
     reset: () =>
@@ -164,6 +231,7 @@ export const useProjectStore = create<ProjectState>()(
         state.selectedId = null
         state.coverageSpacing = 0.25
         state.previewNonce = 0
+        state.coverage = createCoverageState()
       }),
   })),
 )

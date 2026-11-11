@@ -1,6 +1,8 @@
 import { Canvas } from '@react-three/fiber'
 import { Grid, OrbitControls } from '@react-three/drei'
 import { RoomMesh } from './RoomMesh'
+import { SpeakerMesh } from './SpeakerMesh'
+import { ListenerMarker } from './ListenerMarker'
 
 export function Viewport3D() {
   return (
@@ -33,6 +35,8 @@ export function Viewport3D() {
           infiniteGrid
         />
         <RoomMesh />
+        <SpeakerMesh />
+        <ListenerMarker />
         <OrbitControls makeDefault target={[2, 2, 1.5]} />
       </Canvas>
     </div>

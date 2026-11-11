@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useProjectStore } from '../../store/projectStore'
 import { useSvgViewport } from '../../hooks/useSvgViewport'
-import { snap } from '../../lib/math'
+import { degToRad, snap } from '../../lib/math'
 
 export function Viewport2D() {
   const project = useProjectStore((state) => state.project)
@@ -10,6 +10,9 @@ export function Viewport2D() {
   const addRoomPoint = useProjectStore((state) => state.addRoomPoint)
   const closeRoom = useProjectStore((state) => state.closeRoom)
   const cancelRoom = useProjectStore((state) => state.cancelRoom)
+  const addSpeaker = useProjectStore((state) => state.addSpeaker)
+  const setListener = useProjectStore((state) => state.setListener)
+  const select = useProjectStore((state) => state.select)
   const {
     view,
     svgRef,
@@ -35,9 +38,11 @@ export function Viewport2D() {
 
   const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
     if (event.button !== 0 || event.shiftKey) return
-    if (activeTool !== 'room') return
     const point = screenToWorld(event.clientX, event.clientY)
-    addRoomPoint({ x: snap(point.x, 0.25), y: snap(point.y, 0.25) })
+    const snapped = { x: snap(point.x, 0.25), y: snap(point.y, 0.25) }
+    if (activeTool === 'room') addRoomPoint(snapped)
+    if (activeTool === 'speaker') addSpeaker(snapped)
+    if (activeTool === 'listener') setListener(snapped)
   }
 
   const step = view.w > 24 ? 2 : view.w > 12 ? 1 : 0.25
@@ -132,10 +137,81 @@ export function Viewport2D() {
             fill="#fbbf24"
           />
         ))}
+        {project.speakers.map((speaker) => {
+          const angle = degToRad(speaker.yawDeg)
+          const dx = -Math.sin(angle)
+          const dy = -Math.cos(angle)
+          return (
+            <g
+              key={speaker.id}
+              transform={`translate(${speaker.position.x},${-speaker.position.y})`}
+              className="cursor-pointer"
+              onClick={(event) => {
+                event.stopPropagation()
+                select(speaker.id)
+              }}
+            >
+              <circle
+                r={view.w * 0.012}
+                fill="#f59e0b"
+                stroke="#fbbf24"
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+              />
+              <line
+                x1={0}
+                y1={0}
+                x2={dx * view.w * 0.04}
+                y2={dy * view.w * 0.04}
+                stroke="#fbbf24"
+                strokeWidth={2}
+                vectorEffect="non-scaling-stroke"
+              />
+            </g>
+          )
+        })}
+        <g
+          transform={`translate(${project.listener.position.x},${-project.listener.position.y})`}
+          className="cursor-pointer"
+          onClick={(event) => {
+            event.stopPropagation()
+            select(project.listener.id)
+          }}
+        >
+          <circle
+            r={view.w * 0.012}
+            fill="#0b0f14"
+            stroke="#38bdf8"
+            strokeWidth={2}
+            vectorEffect="non-scaling-stroke"
+          />
+          <line
+            x1={-view.w * 0.008}
+            y1={0}
+            x2={view.w * 0.008}
+            y2={0}
+            stroke="#38bdf8"
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
+          <line
+            x1={0}
+            y1={-view.w * 0.008}
+            x2={0}
+            y2={view.w * 0.008}
+            stroke="#38bdf8"
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
+        </g>
       </svg>
-      {activeTool === 'room' && (
+      {activeTool !== 'select' && (
         <div className="pointer-events-none absolute bottom-3 left-3 rounded bg-slate-900/90 px-3 py-2 text-xs text-slate-300 ring-1 ring-slate-700">
-          Click to place points. Press Enter to close. Esc to cancel.
+          {activeTool === 'room'
+            ? 'Click to place points. Press Enter to close. Esc to cancel.'
+            : activeTool === 'speaker'
+              ? 'Click to place a speaker.'
+              : 'Click to place the listener.'}
         </div>
       )}
     </div>

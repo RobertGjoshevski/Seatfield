@@ -30,4 +30,22 @@ describe('Inspector', () => {
     })
     expect(useProjectStore.getState().project.listener.earHeight).toBe(1.7)
   })
+
+  it('edits a speaker position, disables it, and removes it', () => {
+    useProjectStore.getState().addSpeaker({ x: 1, y: 1 })
+    render(<Inspector />)
+
+    fireEvent.change(screen.getByLabelText('Position X'), {
+      target: { value: '2.5' },
+    })
+    expect(
+      useProjectStore.getState().project.speakers[0].position.x,
+    ).toBe(2.5)
+
+    fireEvent.click(screen.getByLabelText('Enabled'))
+    expect(useProjectStore.getState().project.speakers[0].enabled).toBe(false)
+
+    fireEvent.click(screen.getByText('Remove speaker'))
+    expect(useProjectStore.getState().project.speakers).toHaveLength(0)
+  })
 })

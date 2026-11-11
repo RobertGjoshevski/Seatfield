@@ -63,6 +63,7 @@ interface ProjectState {
   cancelRoom: () => void
   addSpeaker: (point: Vec2) => void
   updateSpeaker: (id: string, patch: Partial<Speaker>) => void
+  removeSpeaker: (id: string) => void
   setListener: (point: Vec2) => void
   updateListener: (patch: Partial<Listener>) => void
   setCoverageSpacing: (spacing: number) => void
@@ -149,6 +150,14 @@ export const useProjectStore = create<ProjectState>()(
       set((state) => {
         const speaker = state.project.speakers.find((item) => item.id === id)
         if (speaker) Object.assign(speaker, patch)
+      }),
+
+    removeSpeaker: (id) =>
+      set((state) => {
+        state.project.speakers = state.project.speakers.filter(
+          (speaker) => speaker.id !== id,
+        )
+        if (state.selectedId === id) state.selectedId = null
       }),
 
     setListener: (point) =>

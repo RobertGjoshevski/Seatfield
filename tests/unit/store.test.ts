@@ -49,6 +49,24 @@ describe('project store', () => {
     expect(state.selectedId).toBe(state.project.listener.id)
   })
 
+  it('moves, disables, and removes a speaker', () => {
+    const store = useProjectStore.getState()
+    store.addSpeaker({ x: 1, y: 2 })
+    const id = useProjectStore.getState().project.speakers[0].id
+
+    store.updateSpeaker(id, {
+      position: { x: 3, y: 4, z: 1.5 },
+      enabled: false,
+    })
+    let speaker = useProjectStore.getState().project.speakers[0]
+    expect(speaker.position).toEqual({ x: 3, y: 4, z: 1.5 })
+    expect(speaker.enabled).toBe(false)
+
+    store.removeSpeaker(id)
+    expect(useProjectStore.getState().project.speakers).toHaveLength(0)
+    expect(useProjectStore.getState().selectedId).toBeNull()
+  })
+
   it('replaces the whole project', () => {
     const current = useProjectStore.getState().project
     useProjectStore.getState().replaceProject({

@@ -56,7 +56,7 @@ export function ResultsPanel() {
         ? 'Ready'
         : status === 'error'
           ? 'Error'
-          : 'Waiting for a room'
+          : 'No room yet'
   const statusTone =
     status === 'error'
       ? 'text-rose-400'
@@ -76,7 +76,7 @@ export function ResultsPanel() {
         <div className="flex items-center gap-2">
           <span
             data-testid="coverage-status"
-            className={`text-xs font-medium ${statusTone}`}
+            className={`whitespace-nowrap text-xs font-medium ${statusTone}`}
           >
             {statusLabel}
           </span>

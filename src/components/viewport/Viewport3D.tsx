@@ -1,19 +1,32 @@
 import { Canvas } from '@react-three/fiber'
 import { Grid, OrbitControls } from '@react-three/drei'
+import * as THREE from 'three'
+import { polygonBounds } from '../../core/geometry/polygon'
+import { useProjectStore } from '../../store/projectStore'
 import { RoomMesh } from './RoomMesh'
 import { SpeakerMesh } from './SpeakerMesh'
 import { ListenerMarker } from './ListenerMarker'
 import { CoveragePlane3D } from './CoveragePlane3D'
 
 export function Viewport3D() {
+  const boundary = useProjectStore((state) => state.project.room.boundary)
+  const bounds = boundary.length >= 3 ? polygonBounds(boundary) : null
+  const target: [number, number, number] = bounds
+    ? [
+        (bounds.minX + bounds.maxX) / 2,
+        (bounds.minY + bounds.maxY) / 2,
+        1.2,
+      ]
+    : [2, 2, 1.5]
+
   return (
     <div data-testid="viewport-3d" className="h-full w-full">
       <Canvas
-        shadows
-        camera={{ position: [7, -7, 6], fov: 50 }}
+        shadows={{ type: THREE.PCFShadowMap }}
+        camera={{ position: [8, -8, 7], fov: 45 }}
         onCreated={({ camera }) => {
           camera.up.set(0, 0, 1)
-          camera.lookAt(2, 2, 1.5)
+          camera.lookAt(target[0], target[1], target[2])
         }}
       >
         <color attach="background" args={['#0b0f14']} />
@@ -23,6 +36,7 @@ export function Viewport3D() {
           intensity={2}
           castShadow
         />
+        <directionalLight position={[-6, 8, 5]} intensity={0.7} color="#38bdf8" />
         <Grid
           args={[20, 20]}
           position={[0, 0, -0.01]}
@@ -39,7 +53,7 @@ export function Viewport3D() {
         <CoveragePlane3D />
         <SpeakerMesh />
         <ListenerMarker />
-        <OrbitControls makeDefault target={[2, 2, 1.5]} />
+        <OrbitControls makeDefault target={target} />
       </Canvas>
     </div>
   )

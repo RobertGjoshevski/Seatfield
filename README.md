@@ -10,7 +10,9 @@ modes, RT60, and a full frequency-response solver.
 - Draw a polygonal room in the 2D top view.
 - Extrude the room to a 3D view with translucent walls.
 - Place full-range speakers and a listener.
-- Set speaker gain, acoustic height, yaw, and nominal coverage angle.
+- Drag speakers and the listener in the 2D view to compare placements.
+- Set speaker position, gain, acoustic height, yaw, and nominal coverage angle.
+- Enable, disable, or remove a speaker to A/B a placement.
 - Compute a direct-field coverage heatmap on a configurable grid.
 - Inspect minimum, mean, maximum, and standard deviation of coverage.
 - Compare placements manually by moving a speaker and watching the map.
@@ -29,6 +31,8 @@ Open the URL printed by Vite.
 
 - **Room tool**: click points, then press `Enter` to close the polygon.
 - **Speaker / Listener tools**: click in the 2D view to place.
+- **Move**: drag a speaker or listener marker, or edit Position X/Y in the inspector.
+- **A/B**: uncheck `Enabled` in the inspector, or remove the speaker.
 - **Pan**: middle-drag, or hold `Shift` and drag.
 - **Zoom**: mouse wheel.
 - **Cancel**: `Esc`.

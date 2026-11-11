@@ -7,6 +7,7 @@ export function Inspector() {
   const selectedId = useProjectStore((state) => state.selectedId)
   const updateRoom = useProjectStore((state) => state.updateRoom)
   const updateSpeaker = useProjectStore((state) => state.updateSpeaker)
+  const removeSpeaker = useProjectStore((state) => state.removeSpeaker)
   const updateListener = useProjectStore((state) => state.updateListener)
   const setCoverageSpacing = useProjectStore((state) => state.setCoverageSpacing)
   const coverageSpacing = useProjectStore((state) => state.coverageSpacing)
@@ -78,6 +79,28 @@ export function Inspector() {
               unit="dB"
             />
             <NumberField
+              label="Position X"
+              value={speaker.position.x}
+              step={0.05}
+              onChange={(value) =>
+                updateSpeaker(speaker.id, {
+                  position: { ...speaker.position, x: value },
+                })
+              }
+              unit="m"
+            />
+            <NumberField
+              label="Position Y"
+              value={speaker.position.y}
+              step={0.05}
+              onChange={(value) =>
+                updateSpeaker(speaker.id, {
+                  position: { ...speaker.position, y: value },
+                })
+              }
+              unit="m"
+            />
+            <NumberField
               label="Acoustic height"
               value={speaker.position.z}
               min={0.1}
@@ -110,6 +133,23 @@ export function Inspector() {
               }
               unit="°"
             />
+            <label className="flex items-center justify-between gap-3 text-xs text-slate-400">
+              Enabled
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-teal-500"
+                checked={speaker.enabled}
+                onChange={(event) =>
+                  updateSpeaker(speaker.id, { enabled: event.target.checked })
+                }
+              />
+            </label>
+            <button
+              className="mt-1 w-full rounded border border-rose-900/70 px-2 py-1 text-xs text-rose-300 hover:bg-rose-950/40"
+              onClick={() => removeSpeaker(speaker.id)}
+            >
+              Remove speaker
+            </button>
           </>
         ) : (
           <>
@@ -132,8 +172,30 @@ export function Inspector() {
               onChange={(value) => updateListener({ earHeight: value })}
               unit="m"
             />
+            <NumberField
+              label="Position X"
+              value={project.listener.position.x}
+              step={0.05}
+              onChange={(value) =>
+                updateListener({
+                  position: { ...project.listener.position, x: value },
+                })
+              }
+              unit="m"
+            />
+            <NumberField
+              label="Position Y"
+              value={project.listener.position.y}
+              step={0.05}
+              onChange={(value) =>
+                updateListener({
+                  position: { ...project.listener.position, y: value },
+                })
+              }
+              unit="m"
+            />
             <div className="text-xs text-slate-500">
-              Select a speaker in the 2D or 3D view to edit it.
+              Drag a marker to move it, or select a speaker to edit it.
             </div>
           </>
         )}

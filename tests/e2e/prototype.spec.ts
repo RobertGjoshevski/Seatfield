@@ -43,6 +43,25 @@ test('draws a room, previews coverage, and restores the project', async ({
 
   await page.getByTestId('tool-speaker').click()
   await clickWorld(page, 2, 0.5)
+
+  const speakerDot = page.getByTestId('speaker-dot').first()
+  const dotBox = await speakerDot.boundingBox()
+  if (!dotBox) throw new Error('Expected a speaker marker')
+  await page.mouse.move(
+    dotBox.x + dotBox.width / 2,
+    dotBox.y + dotBox.height / 2,
+  )
+  await page.mouse.down()
+  await page.mouse.move(
+    dotBox.x + dotBox.width / 2 + 50,
+    dotBox.y + dotBox.height / 2 - 35,
+    { steps: 5 },
+  )
+  await page.mouse.up()
+  expect(
+    Number(await page.getByLabel('Position X').inputValue()),
+  ).not.toBe(2)
+
   await page.getByLabel('Yaw').fill('180')
 
   await page.getByTestId('tool-listener').click()

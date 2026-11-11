@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
+import { Line } from '@react-three/drei'
 import { useCoverageHeatmap } from '../../hooks/useCoverageHeatmap'
 
 export function CoveragePlane3D() {
@@ -33,22 +34,37 @@ export function CoveragePlane3D() {
   const height = Math.max((grid.ny - 1) * grid.spacing, grid.spacing)
 
   return (
-    <mesh
+    <group
       position={[
         grid.minX + width / 2,
         grid.minY + height / 2,
         grid.listenerZ,
       ]}
     >
-      <planeGeometry args={[width, height]} />
-      <meshBasicMaterial
-        map={texture}
+      <mesh>
+        <planeGeometry args={[width, height]} />
+        <meshBasicMaterial
+          map={texture}
+          transparent
+          opacity={0.82}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+      <Line
+        points={[
+          [-width / 2, -height / 2, 0.005],
+          [width / 2, -height / 2, 0.005],
+          [width / 2, height / 2, 0.005],
+          [-width / 2, height / 2, 0.005],
+          [-width / 2, -height / 2, 0.005],
+        ]}
+        color="#2dd4bf"
+        lineWidth={1}
         transparent
-        opacity={0.78}
-        side={THREE.DoubleSide}
-        depthWrite={false}
-        toneMapped={false}
+        opacity={0.45}
       />
-    </mesh>
+    </group>
   )
 }

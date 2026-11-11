@@ -1,19 +1,25 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useProjectStore } from '../../store/projectStore'
 import { useSvgViewport } from '../../hooks/useSvgViewport'
 import { CoverageOverlay2D } from './CoverageOverlay2D'
 import { degToRad, snap } from '../../lib/math'
 
+type DragTarget = { kind: 'speaker' | 'listener'; id: string }
+
 export function Viewport2D() {
   const project = useProjectStore((state) => state.project)
   const activeTool = useProjectStore((state) => state.activeTool)
   const roomDraft = useProjectStore((state) => state.roomDraft)
+  const selectedId = useProjectStore((state) => state.selectedId)
   const addRoomPoint = useProjectStore((state) => state.addRoomPoint)
   const closeRoom = useProjectStore((state) => state.closeRoom)
   const cancelRoom = useProjectStore((state) => state.cancelRoom)
   const addSpeaker = useProjectStore((state) => state.addSpeaker)
+  const updateSpeaker = useProjectStore((state) => state.updateSpeaker)
   const setListener = useProjectStore((state) => state.setListener)
   const select = useProjectStore((state) => state.select)
+  const setTool = useProjectStore((state) => state.setTool)
+  const [drag, setDrag] = useState<DragTarget | null>(null)
   const {
     view,
     svgRef,
@@ -30,6 +36,7 @@ export function Viewport2D() {
         closeRoom()
       }
       if (event.key === 'Escape') {
+        setDrag(null)
         cancelRoom()
       }
     }
@@ -44,6 +51,55 @@ export function Viewport2D() {
     if (activeTool === 'room') addRoomPoint(snapped)
     if (activeTool === 'speaker') addSpeaker(snapped)
     if (activeTool === 'listener') setListener(snapped)
+  }
+
+  const handlePointerDown = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (drag) return
+    onPointerDown(event)
+  }
+
+  const handlePointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (!drag) {
+      onPointerMove(event)
+      return
+    }
+
+    const point = screenToWorld(event.clientX, event.clientY)
+    const snapped = { x: snap(point.x, 0.25), y: snap(point.y, 0.25) }
+    if (drag.kind === 'speaker') {
+      const speaker = project.speakers.find((item) => item.id === drag.id)
+      if (speaker) {
+        updateSpeaker(drag.id, {
+          position: { ...speaker.position, x: snapped.x, y: snapped.y },
+        })
+      }
+    } else {
+      setListener(snapped)
+    }
+  }
+
+  const handlePointerUp = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (!drag) {
+      onPointerUp(event)
+      return
+    }
+    setDrag(null)
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+  }
+
+  const startDrag = (
+    event: React.PointerEvent<SVGGElement>,
+    target: DragTarget,
+  ) => {
+    if (event.button !== 0 || event.shiftKey) return
+    event.stopPropagation()
+    event.preventDefault()
+    select(target.id)
+    if (activeTool !== 'select') setTool('select')
+    setDrag(target)
+    svgRef.current?.setPointerCapture(event.pointerId)
   }
 
   const step = view.w > 24 ? 2 : view.w > 12 ? 1 : 0.25
@@ -96,9 +152,9 @@ export function Viewport2D() {
         className="h-full w-full touch-none"
         viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
         onWheel={onWheel}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
         onClick={handleClick}
         style={{ cursor: activeTool === 'room' ? 'crosshair' : 'default' }}
       >
@@ -143,17 +199,30 @@ export function Viewport2D() {
           const angle = degToRad(speaker.yawDeg)
           const dx = -Math.sin(angle)
           const dy = -Math.cos(angle)
+          const selected = selectedId === speaker.id
+          const dragging = drag?.id === speaker.id
           return (
             <g
               key={speaker.id}
+              data-testid="speaker-marker"
               transform={`translate(${speaker.position.x},${-speaker.position.y})`}
-              className="cursor-pointer"
-              onClick={(event) => {
-                event.stopPropagation()
-                select(speaker.id)
-              }}
+              className={dragging ? 'cursor-grabbing' : 'cursor-grab'}
+              onPointerDown={(event) =>
+                startDrag(event, { kind: 'speaker', id: speaker.id })
+              }
             >
+              {selected && (
+                <circle
+                  r={view.w * 0.019}
+                  fill="none"
+                  stroke="#fde68a"
+                  strokeWidth={1}
+                  strokeDasharray="3 3"
+                  vectorEffect="non-scaling-stroke"
+                />
+              )}
               <circle
+                data-testid="speaker-dot"
                 r={view.w * 0.012}
                 fill="#f59e0b"
                 stroke="#fbbf24"
@@ -173,14 +242,25 @@ export function Viewport2D() {
           )
         })}
         <g
+          data-testid="listener-marker"
           transform={`translate(${project.listener.position.x},${-project.listener.position.y})`}
-          className="cursor-pointer"
-          onClick={(event) => {
-            event.stopPropagation()
-            select(project.listener.id)
-          }}
+          className={drag?.id === project.listener.id ? 'cursor-grabbing' : 'cursor-grab'}
+          onPointerDown={(event) =>
+            startDrag(event, { kind: 'listener', id: project.listener.id })
+          }
         >
+          {selectedId === project.listener.id && (
+            <circle
+              r={view.w * 0.019}
+              fill="none"
+              stroke="#7dd3fc"
+              strokeWidth={1}
+              strokeDasharray="3 3"
+              vectorEffect="non-scaling-stroke"
+            />
+          )}
           <circle
+            data-testid="listener-dot"
             r={view.w * 0.012}
             fill="#0b0f14"
             stroke="#38bdf8"

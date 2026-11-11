@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
+import { Edges } from '@react-three/drei'
 import { useProjectStore } from '../../store/projectStore'
 import { buildWallMeshes } from '../../core/geometry/walls'
 
@@ -24,7 +25,7 @@ export function RoomMesh() {
     <group>
       <mesh receiveShadow>
         <shapeGeometry args={[shape]} />
-        <meshStandardMaterial color="#111827" side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#0f1b24" side={THREE.DoubleSide} />
       </mesh>
       {walls.map((wall, index) => (
         <mesh
@@ -38,9 +39,10 @@ export function RoomMesh() {
           <meshStandardMaterial
             color="#334155"
             transparent
-            opacity={0.72}
+            opacity={0.5}
             side={THREE.DoubleSide}
           />
+          <Edges color="#475569" />
         </mesh>
       ))}
     </group>

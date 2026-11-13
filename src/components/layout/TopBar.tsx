@@ -1,3 +1,4 @@
+import { CircleHelp } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { polygonArea } from '../../core/geometry/polygon'
 import { captureProjectSnapshot } from '../../hooks/useProjectPersistence'
@@ -12,11 +13,13 @@ import type { PersistenceStatus } from '../../hooks/useProjectPersistence'
 interface TopBarProps {
   persistenceStatus?: PersistenceStatus
   onSave?: () => boolean
+  onShowGuide?: () => void
 }
 
 export function TopBar({
   persistenceStatus = 'saved',
   onSave,
+  onShowGuide,
 }: TopBarProps) {
   const project = useProjectStore((state) => state.project)
   const roomDraft = useProjectStore((state) => state.roomDraft)
@@ -79,6 +82,15 @@ export function TopBar({
           {loadError}
         </span>
       ) : null}
+      <button
+        type="button"
+        data-testid="show-guide"
+        className="inline-flex items-center gap-1 rounded border border-slate-700 px-3 py-1 text-xs text-slate-300 hover:bg-slate-800"
+        onClick={() => onShowGuide?.()}
+      >
+        <CircleHelp size={14} />
+        Guide
+      </button>
       <button
         data-testid="save-setup"
         className="rounded border border-slate-700 px-3 py-1 text-xs text-slate-300 hover:bg-slate-800 disabled:opacity-40"

@@ -4,9 +4,44 @@ import {
   useProjectStore,
 } from '../../src/store/projectStore'
 
+function clearSpeakers() {
+  useProjectStore.setState((state) => {
+    state.project.speakers = []
+    state.selectedId = null
+    state.selectedIds = []
+  })
+}
+
 describe('project store', () => {
   beforeEach(() => {
     useProjectStore.getState().reset()
+    clearSpeakers()
+  })
+
+  it('starts with a rectangular room and two speakers', () => {
+    useProjectStore.getState().reset()
+    const project = useProjectStore.getState().project
+    expect(project.room.boundary).toEqual([
+      { x: 0, y: 0 },
+      { x: 5, y: 0 },
+      { x: 5, y: 4 },
+      { x: 0, y: 4 },
+    ])
+    expect(project.room.height).toBe(3)
+    expect(project.speakers[0]).toMatchObject({
+      name: 'Left',
+      position: { x: 1.5, y: 3.2, z: 1.2 },
+      yawDeg: 0,
+      enabled: true,
+    })
+    expect(project.speakers[1]).toMatchObject({
+      name: 'Right',
+      position: { x: 3.5, y: 3.2, z: 1.2 },
+      yawDeg: 0,
+      enabled: true,
+    })
+    expect(project.listener.position).toEqual({ x: 2.5, y: 1.2 })
+    expect(useProjectStore.getState().activeTool).toBe('select')
   })
 
   it('closes a simple room', () => {
@@ -30,7 +65,12 @@ describe('project store', () => {
     store.addRoomPoint({ x: 4, y: 0 })
     store.addRoomPoint({ x: 0, y: 3 })
     store.closeRoom()
-    expect(useProjectStore.getState().project.room.boundary).toHaveLength(0)
+    expect(useProjectStore.getState().project.room.boundary).toEqual([
+      { x: 0, y: 0 },
+      { x: 5, y: 0 },
+      { x: 5, y: 4 },
+      { x: 0, y: 4 },
+    ])
   })
 
   it('updates room properties', () => {

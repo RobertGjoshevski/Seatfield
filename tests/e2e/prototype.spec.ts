@@ -26,11 +26,13 @@ test('draws a room, previews coverage, and restores the project', async ({
   await page.addInitScript(() => {
     if (!sessionStorage.getItem('e2e-seeded')) {
       localStorage.clear()
+      localStorage.setItem('seatfield:guide:v1', 'dismissed')
       sessionStorage.setItem('e2e-seeded', '1')
     }
   })
   await page.goto('/')
 
+  await page.getByTestId('tool-room').click()
   await clickWorld(page, 0, 0)
   await clickWorld(page, 4, 0)
   await clickWorld(page, 4, 3)

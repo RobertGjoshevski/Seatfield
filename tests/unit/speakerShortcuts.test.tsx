@@ -11,6 +11,11 @@ function Harness() {
 describe('speaker shortcuts', () => {
   beforeEach(() => {
     useProjectStore.getState().reset()
+    useProjectStore.setState((state) => {
+      state.project.speakers = []
+      state.selectedId = null
+      state.selectedIds = []
+    })
   })
 
   it('copies and pastes the selected speakers', () => {

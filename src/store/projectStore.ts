@@ -36,6 +36,29 @@ import {
   type ViewMode,
 } from '../core/types'
 
+function createSpeaker(
+  point: Vec2,
+  name: string,
+  z = 1,
+): Speaker {
+  return {
+    id: crypto.randomUUID(),
+    name,
+    position: { x: point.x, y: point.y, z },
+    yawDeg: 0,
+    gainDb: 0,
+    phaseInverted: false,
+    delayMs: 0,
+    coverageHorizontalDeg: 90,
+    radiatorDiameterM: 0.13,
+    widthM: DEFAULT_SPEAKER_WIDTH_M,
+    depthM: DEFAULT_SPEAKER_DEPTH_M,
+    heightM: DEFAULT_SPEAKER_HEIGHT_M,
+    enabled: true,
+  }
+}
+
+/** 5 m × 4 m room. Yaw 0 aims toward −Y, so the pair sits on the far wall. */
 export function createDefaultProject(): Project {
   return {
     schemaVersion: 1,
@@ -44,17 +67,25 @@ export function createDefaultProject(): Project {
     room: {
       id: crypto.randomUUID(),
       name: 'Room',
-      boundary: [],
+      boundary: [
+        { x: 0, y: 0 },
+        { x: 5, y: 0 },
+        { x: 5, y: 4 },
+        { x: 0, y: 4 },
+      ],
       height: 3,
       wallThickness: 0.1,
       kind: 'room',
     },
     objects: [],
-    speakers: [],
+    speakers: [
+      createSpeaker({ x: 1.5, y: 3.2 }, 'Left', 1.2),
+      createSpeaker({ x: 3.5, y: 3.2 }, 'Right', 1.2),
+    ],
     listener: {
       id: crypto.randomUUID(),
       name: 'Listener',
-      position: { x: 2, y: 2 },
+      position: { x: 2.5, y: 1.2 },
       earHeight: 1.2,
     },
   }
@@ -284,7 +315,7 @@ function fitObject(object: RoomObject, roomHeight: number) {
 export const useProjectStore = create<ProjectState>()(
   immer((set) => ({
     project: createDefaultProject(),
-    activeTool: 'room',
+    activeTool: 'select',
     viewMode: '2d',
     roomShape: 'polygon',
     roomDraft: [],
@@ -597,21 +628,10 @@ export const useProjectStore = create<ProjectState>()(
 
     addSpeaker: (point) =>
       set((state) => {
-        const speaker: Speaker = {
-          id: crypto.randomUUID(),
-          name: `Speaker ${state.project.speakers.length + 1}`,
-          position: { x: point.x, y: point.y, z: 1 },
-          yawDeg: 0,
-          gainDb: 0,
-          phaseInverted: false,
-          delayMs: 0,
-          coverageHorizontalDeg: 90,
-          radiatorDiameterM: 0.13,
-          widthM: DEFAULT_SPEAKER_WIDTH_M,
-          depthM: DEFAULT_SPEAKER_DEPTH_M,
-          heightM: DEFAULT_SPEAKER_HEIGHT_M,
-          enabled: true,
-        }
+        const speaker = createSpeaker(
+          point,
+          `Speaker ${state.project.speakers.length + 1}`,
+        )
         state.project.speakers.push(speaker)
         replaceSelection(state, speaker.id)
         state.activeTool = 'select'
@@ -863,7 +883,7 @@ export const useProjectStore = create<ProjectState>()(
     reset: () =>
       set((state) => {
         state.project = createDefaultProject()
-        state.activeTool = 'room'
+        state.activeTool = 'select'
         state.viewMode = '2d'
         state.roomShape = 'polygon'
         clearSketch(state)

@@ -8,6 +8,11 @@ import { useProjectStore } from '../../src/store/projectStore'
 describe('Inspector', () => {
   beforeEach(() => {
     useProjectStore.getState().reset()
+    useProjectStore.setState((state) => {
+      state.project.speakers = []
+      state.selectedId = null
+      state.selectedIds = []
+    })
   })
 
   it('updates the room height', () => {

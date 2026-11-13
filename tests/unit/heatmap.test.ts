@@ -43,6 +43,8 @@ describe('heatmap helpers', () => {
     const grid: CoverageGrid = {
       minX: 0,
       minY: 0,
+      maxX: 2,
+      maxY: 1,
       spacing: 1,
       nx: 2,
       ny: 1,
@@ -60,6 +62,8 @@ describe('heatmap helpers', () => {
     const grid: CoverageGrid = {
       minX: 0,
       minY: 0,
+      maxX: 1,
+      maxY: 2,
       spacing: 1,
       nx: 1,
       ny: 2,

@@ -1,6 +1,8 @@
 import { Headphones, RefreshCw } from 'lucide-react'
-import { powerSumDb, splAtPoint } from '../../core/acoustics/directField'
+import { fieldModelFor, fieldModelLabel } from '../../core/acoustics/roomField'
+import { axisAlignedRectangle } from '../../core/geometry/dimensions'
 import { useCoverageHeatmap } from '../../hooks/useCoverageHeatmap'
+import { useListenerLevel } from '../../hooks/useListenerLevel'
 import { useProjectStore } from '../../store/projectStore'
 
 function formatDb(value: number | undefined, digits = 1): string {
@@ -31,23 +33,41 @@ function Stat({ label, value, testId }: StatProps) {
 export function ResultsPanel() {
   const { status, stats, gradientCss, minDb, maxDb } = useCoverageHeatmap()
   const coverage = useProjectStore((state) => state.coverage)
-  const speakers = useProjectStore((state) => state.project.speakers)
-  const listener = useProjectStore((state) => state.project.listener)
+  const room = useProjectStore((state) => state.project.room)
+  const frequencyHz = useProjectStore((state) => state.previewFrequencyHz)
+  const reflectionOrder = useProjectStore((state) => state.reflectionOrder)
+  const objectCount = useProjectStore((state) => state.project.objects.length)
   const bumpPreview = useProjectStore((state) => state.bumpPreview)
 
-  const enabledSpeakers = speakers.filter((speaker) => speaker.enabled)
-  const listenerLevel =
-    enabledSpeakers.length > 0
-      ? powerSumDb(
-          enabledSpeakers.map((speaker) =>
-            splAtPoint(speaker, {
-              x: listener.position.x,
-              y: listener.position.y,
-              z: listener.earHeight,
-            }),
-          ),
-        )
-      : undefined
+  const listenerLevel = useListenerLevel()
+  const rectangular =
+    room.boundary.length >= 3 && axisAlignedRectangle(room.boundary) !== null
+  const openLabel =
+    reflectionOrder === 0 ? 'direct over open ground' : 'direct + ground'
+  const baseModel =
+    room.kind === 'open'
+      ? openLabel
+      : room.boundary.length >= 3
+        ? fieldModelLabel(fieldModelFor(frequencyHz, rectangular), rectangular)
+        : 'no room'
+  const modelLabel =
+    room.kind === 'open'
+      ? objectCount > 0
+        ? `${openLabel}, objects blocking`
+        : openLabel
+      : objectCount > 0
+        ? reflectionOrder === 0
+          ? 'direct, objects blocking'
+          : `reflections, order ${reflectionOrder}`
+        : baseModel.includes('reflection') && reflectionOrder === 0
+          ? baseModel.replace('reflections', 'direct')
+          : baseModel.includes('reflection') && reflectionOrder > 1
+            ? `${baseModel}, order ${reflectionOrder}`
+            : baseModel
+  const frequencyLabel =
+    frequencyHz >= 1000
+      ? `${(frequencyHz / 1000).toFixed(frequencyHz % 1000 === 0 ? 0 : 2)} kHz`
+      : `${frequencyHz} Hz`
 
   const statusLabel =
     status === 'running'
@@ -56,7 +76,9 @@ export function ResultsPanel() {
         ? 'Ready'
         : status === 'error'
           ? 'Error'
-          : 'No room yet'
+          : room.kind === 'open'
+            ? 'No area yet'
+            : 'No room yet'
   const statusTone =
     status === 'error'
       ? 'text-rose-400'
@@ -91,8 +113,8 @@ export function ResultsPanel() {
         </div>
         <div className="text-[11px] text-slate-500">
           {coverage.elapsedMs !== null
-            ? `${coverage.elapsedMs.toFixed(0)} ms`
-            : 'Direct-field preview'}
+            ? `${coverage.elapsedMs.toFixed(0)} ms · ${frequencyLabel}`
+            : `${frequencyLabel} · ${modelLabel}`}
         </div>
         <div className="max-h-14 space-y-1 overflow-y-auto">
           {coverage.warnings.map((warning) => (
@@ -136,7 +158,9 @@ export function ResultsPanel() {
           <span>
             Points <span data-testid="coverage-points">{stats?.count ?? '—'}</span>
           </span>
-          <span>Relative dB · direct field only</span>
+          <span>
+            Relative dB at {frequencyLabel} · {modelLabel}
+          </span>
         </div>
       </section>
 
@@ -149,8 +173,8 @@ export function ResultsPanel() {
           style={{ background: gradientCss }}
         />
         <div className="mt-1 flex justify-between text-[10px] text-slate-500">
-          <span>{minDb} dB</span>
-          <span>{maxDb} dB</span>
+          <span>{Number.isFinite(minDb) ? minDb.toFixed(1) : '—'} dB</span>
+          <span>{Number.isFinite(maxDb) ? maxDb.toFixed(1) : '—'} dB</span>
         </div>
         <div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
           <Headphones size={14} />

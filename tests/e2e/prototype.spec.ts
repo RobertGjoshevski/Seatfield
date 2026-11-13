@@ -62,7 +62,7 @@ test('draws a room, previews coverage, and restores the project', async ({
     Number(await page.getByLabel('Position X').inputValue()),
   ).not.toBe(2)
 
-  await page.getByLabel('Yaw').fill('180')
+  await page.getByLabel('Aim').fill('180')
 
   await page.getByTestId('tool-listener').click()
   await clickWorld(page, 2, 2)

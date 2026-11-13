@@ -1,4 +1,4 @@
-# Room Response Studio — Phase 0 Prototype Implementation Plan
+# Seatfield — Phase 0 Prototype Implementation Plan
 
 > **For agentic workers:** implement this plan task-by-task, in order, checking off each step as it lands. Steps use checkbox (`- [ ]`) syntax for tracking. Dispatch a fresh subagent per task where tasks are independent; otherwise execute inline with a review checkpoint after each task.
 
@@ -75,7 +75,7 @@
 
 ```json
 {
-  "name": "room-response-studio",
+  "name": "seatfield",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -110,7 +110,7 @@ Expected: both commands exit 0 and `package-lock.json` is created.
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Room Response Studio</title>
+    <title>Seatfield</title>
   </head>
   <body>
     <div id="root"></div>
@@ -208,7 +208,7 @@ export default function App() {
   return (
     <div className="flex h-screen w-screen flex-col bg-slate-950 text-slate-100">
       <header className="flex h-12 items-center border-b border-slate-800 px-4">
-        <h1 className="text-sm font-semibold tracking-wide">Room Response Studio</h1>
+        <h1 className="text-sm font-semibold tracking-wide">Seatfield</h1>
       </header>
       <div className="flex min-h-0 flex-1">
         <aside className="w-14 border-r border-slate-800" />
@@ -1154,7 +1154,7 @@ export default function App() {
   return (
     <div className="flex h-screen w-screen flex-col bg-slate-950 text-slate-100">
       <header className="flex h-12 items-center border-b border-slate-800 px-4">
-        <h1 className="text-sm font-semibold tracking-wide">Room Response Studio</h1>
+        <h1 className="text-sm font-semibold tracking-wide">Seatfield</h1>
       </header>
       <div className="flex min-h-0 flex-1">
         <aside className="w-14 border-r border-slate-800" />
@@ -1427,7 +1427,7 @@ export function TopBar() {
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-4 border-b border-slate-800 px-4">
-      <h1 className="text-sm font-semibold tracking-wide">Room Response Studio</h1>
+      <h1 className="text-sm font-semibold tracking-wide">Seatfield</h1>
       <span data-testid="room-status" className="text-xs text-slate-400">
         {boundary.length >= 3
           ? `Room: ${boundary.length} vertices · ${area.toFixed(1)} m²`
@@ -3934,7 +3934,7 @@ export interface PersistedProject {
   coverageSpacing: number
 }
 
-export const STORAGE_KEY = 'room-response-studio:project:v1'
+export const STORAGE_KEY = 'seatfield:project:v1'
 
 export function savePersistedProject(value: PersistedProject): boolean {
   try {
@@ -4283,7 +4283,7 @@ git commit -m "test: add phase 0 end-to-end flow"
 - [ ] **Step 1: Write `README.md`**
 
 ```md
-# Room Response Studio
+# Seatfield
 
 A browser prototype for sketching a room, placing speakers, and previewing
 direct-field coverage. It is the Phase 0 foundation for a room-response

@@ -13,6 +13,7 @@ const room: Room = {
   ],
   height: 3,
   wallThickness: 0.1,
+  kind: 'room',
 }
 
 describe('wall mesh generation', () => {

@@ -1,5 +1,5 @@
 import type { CoverageGrid } from '../core/geometry/coverage'
-import type { Speaker, Vec2 } from '../core/types'
+import type { RoomObject, SpaceKind, Speaker, Vec2 } from '../core/types'
 
 export interface PreviewRequest {
   type: 'preview'
@@ -7,7 +7,12 @@ export interface PreviewRequest {
   boundary: Vec2[]
   spacing: number
   listenerZ: number
+  roomHeight: number
+  frequencyHz: number
   speakers: Speaker[]
+  objects: RoomObject[]
+  reflectionOrder: number
+  roomKind: SpaceKind
 }
 
 export interface PreviewResult {

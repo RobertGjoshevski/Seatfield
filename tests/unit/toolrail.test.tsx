@@ -12,6 +12,7 @@ describe('ToolRail', () => {
     render(<ToolRail />)
     expect(screen.getByTestId('tool-select')).toBeInTheDocument()
     expect(screen.getByTestId('tool-room')).toBeInTheDocument()
+    expect(screen.getByTestId('tool-object')).toBeInTheDocument()
     expect(screen.getByTestId('tool-speaker')).toBeInTheDocument()
     expect(screen.getByTestId('tool-listener')).toBeInTheDocument()
   })

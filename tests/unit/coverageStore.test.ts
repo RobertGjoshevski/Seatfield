@@ -15,7 +15,7 @@ const boundary = [
 function makeGrid() {
   const grid = buildCoverageGrid(boundary, 1, 1.2)
   if (!grid) throw new Error('Expected a grid')
-  return computeCoverage(grid, [])
+  return computeCoverage(grid, [], { boundary, height: 3 }, 80)
 }
 
 describe('coverage state', () => {

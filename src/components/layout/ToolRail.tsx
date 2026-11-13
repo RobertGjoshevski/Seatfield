@@ -1,10 +1,11 @@
-import { Headphones, MousePointer2, PenLine, Speaker } from 'lucide-react'
+import { Box, Headphones, MousePointer2, PenLine, Speaker } from 'lucide-react'
 import type { Tool } from '../../core/types'
 import { useProjectStore } from '../../store/projectStore'
 
 const tools: { id: Tool; label: string; Icon: typeof MousePointer2 }[] = [
   { id: 'select', label: 'Select', Icon: MousePointer2 },
   { id: 'room', label: 'Room', Icon: PenLine },
+  { id: 'object', label: 'Object', Icon: Box },
   { id: 'speaker', label: 'Speaker', Icon: Speaker },
   { id: 'listener', label: 'Listener', Icon: Headphones },
 ]

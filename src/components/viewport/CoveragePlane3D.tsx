@@ -30,14 +30,14 @@ export function CoveragePlane3D() {
 
   if (!grid || !texture) return null
 
-  const width = Math.max((grid.nx - 1) * grid.spacing, grid.spacing)
-  const height = Math.max((grid.ny - 1) * grid.spacing, grid.spacing)
+  const width = Math.max(grid.maxX - grid.minX, grid.spacing)
+  const height = Math.max(grid.maxY - grid.minY, grid.spacing)
 
   return (
     <group
       position={[
-        grid.minX + width / 2,
-        grid.minY + height / 2,
+        (grid.minX + grid.maxX) / 2,
+        (grid.minY + grid.maxY) / 2,
         grid.listenerZ,
       ]}
     >

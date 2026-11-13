@@ -1,3 +1,7 @@
+import {
+  OBJECT_REFLECTION_WARNING,
+  roomFieldWarning,
+} from '../core/acoustics/roomField'
 import { evaluateCoverage } from '../core/geometry/coverage'
 import type { PreviewRequest, PreviewResponse } from './previewMessages'
 
@@ -23,12 +27,24 @@ scope.onmessage = (event) => {
       request.spacing,
       request.listenerZ,
       request.speakers,
+      request.roomHeight,
+      request.frequencyHz,
+      {
+        objects: request.objects ?? [],
+        reflectionOrder: request.reflectionOrder,
+        kind: request.roomKind ?? 'room',
+      },
     )
     if (!grid) {
       throw new Error('Draw a room with at least three points before previewing.')
     }
 
     const warnings: string[] = []
+    if (request.roomKind !== 'open') {
+      const irregular = roomFieldWarning(request.boundary)
+      if (irregular) warnings.push(irregular)
+    }
+    if ((request.objects ?? []).length > 0) warnings.push(OBJECT_REFLECTION_WARNING)
     const enabled = request.speakers.filter((speaker) => speaker.enabled)
     if (enabled.length === 0) {
       warnings.push('No enabled speakers. Add a speaker to see coverage.')

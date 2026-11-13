@@ -6,16 +6,18 @@ import { Viewport2D } from './components/viewport/Viewport2D'
 import { Viewport3D } from './components/viewport/Viewport3D'
 import { useCoverage } from './hooks/useCoverage'
 import { useProjectPersistence } from './hooks/useProjectPersistence'
+import { useSpeakerShortcuts } from './hooks/useSpeakerShortcuts'
 import { useProjectStore } from './store/projectStore'
 
 export default function App() {
   const viewMode = useProjectStore((state) => state.viewMode)
-  const persistenceStatus = useProjectPersistence()
+  const { status: persistenceStatus, saveNow } = useProjectPersistence()
   useCoverage()
+  useSpeakerShortcuts()
 
   return (
     <div className="flex h-screen w-screen flex-col bg-slate-950 text-slate-100">
-      <TopBar persistenceStatus={persistenceStatus} />
+      <TopBar persistenceStatus={persistenceStatus} onSave={saveNow} />
       <div className="flex min-h-0 flex-1">
         <ToolRail />
         <main className="min-w-0 flex-1">

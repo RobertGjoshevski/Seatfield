@@ -3,6 +3,7 @@ import { Grid, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { polygonBounds } from '../../core/geometry/polygon'
 import { useProjectStore } from '../../store/projectStore'
+import { ObjectMeshes } from './ObjectMeshes'
 import { RoomMesh } from './RoomMesh'
 import { SpeakerMesh } from './SpeakerMesh'
 import { ListenerMarker } from './ListenerMarker'
@@ -11,6 +12,9 @@ import { CoveragePlane3D } from './CoveragePlane3D'
 export function Viewport3D() {
   const boundary = useProjectStore((state) => state.project.room.boundary)
   const bounds = boundary.length >= 3 ? polygonBounds(boundary) : null
+  const span = bounds
+    ? Math.max(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY, 20)
+    : 20
   const target: [number, number, number] = bounds
     ? [
         (bounds.minX + bounds.maxX) / 2,
@@ -38,18 +42,19 @@ export function Viewport3D() {
         />
         <directionalLight position={[-6, 8, 5]} intensity={0.7} color="#38bdf8" />
         <Grid
-          args={[20, 20]}
+          args={[span, span]}
           position={[0, 0, -0.01]}
           rotation={[Math.PI / 2, 0, 0]}
-          cellSize={0.5}
+          cellSize={span > 40 ? 1 : 0.5}
           cellColor="#1e293b"
-          sectionSize={2}
+          sectionSize={span > 40 ? 5 : 2}
           sectionColor="#334155"
-          fadeDistance={30}
+          fadeDistance={Math.max(30, span * 1.5)}
           fadeStrength={1}
           infiniteGrid
         />
         <RoomMesh />
+        <ObjectMeshes />
         <CoveragePlane3D />
         <SpeakerMesh />
         <ListenerMarker />

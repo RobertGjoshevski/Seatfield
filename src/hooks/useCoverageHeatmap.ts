@@ -16,9 +16,11 @@ export function useCoverageHeatmap() {
     () => (grid ? computeCoverageStats(grid.values) : null),
     [grid],
   )
+  const minDb = stats?.minDb ?? DEFAULT_HEATMAP_MIN_DB
+  const maxDb = stats?.maxDb ?? DEFAULT_HEATMAP_MAX_DB
   const rgba = useMemo(
-    () => (grid ? buildCoverageRgba(grid) : null),
-    [grid],
+    () => (grid ? buildCoverageRgba(grid, minDb, maxDb) : null),
+    [grid, minDb, maxDb],
   )
   const gradientCss = useMemo(() => heatmapGradientCss(), [])
 
@@ -27,8 +29,8 @@ export function useCoverageHeatmap() {
     status,
     stats,
     rgba,
-    minDb: DEFAULT_HEATMAP_MIN_DB,
-    maxDb: DEFAULT_HEATMAP_MAX_DB,
+    minDb,
+    maxDb,
     gradientCss,
   }
 }

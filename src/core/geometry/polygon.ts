@@ -7,7 +7,7 @@ export interface Bounds2 {
   maxY: number
 }
 
-export function polygonArea(points: Vec2[]): number {
+export function polygonArea(points: readonly Vec2[]): number {
   if (points.length < 3) return 0
   let sum = 0
   for (let i = 0; i < points.length; i++) {
@@ -18,7 +18,7 @@ export function polygonArea(points: Vec2[]): number {
   return sum / 2
 }
 
-export function polygonBounds(points: Vec2[]): Bounds2 {
+export function polygonBounds(points: readonly Vec2[]): Bounds2 {
   if (points.length === 0) {
     return { minX: 0, minY: 0, maxX: 0, maxY: 0 }
   }
@@ -35,7 +35,7 @@ export function polygonBounds(points: Vec2[]): Bounds2 {
   return { minX, minY, maxX, maxY }
 }
 
-export function pointInPolygon(point: Vec2, polygon: Vec2[]): boolean {
+export function pointInPolygon(point: Vec2, polygon: readonly Vec2[]): boolean {
   let inside = false
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     const xi = polygon[i].x

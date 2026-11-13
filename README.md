@@ -1,13 +1,17 @@
-# Room Response Studio
+# Seatfield
 
-A browser prototype for sketching a room, placing speakers, and previewing
+A browser app for sketching a room, placing speakers, and comparing
 direct-field coverage. It is the Phase 0 foundation for a room-response
 planner that will later add object extrusion, first-order reflections, room
 modes, RT60, and a full frequency-response solver.
 
+Live: https://robertgjoshevski.github.io/Seatfield/
+
 ## What works in this prototype
 
 - Draw a polygonal room in the 2D top view.
+- Draw rectangular solids, set their height and position, and treat them as reflecting walls.
+- Choose reflection order from the direct path through a third bounce.
 - Extrude the room to a 3D view with translucent walls.
 - Place full-range speakers and a listener.
 - Drag speakers and the listener in the 2D view to compare placements.
@@ -30,6 +34,8 @@ Open the URL printed by Vite.
 ## Controls
 
 - **Room tool**: click points, then press `Enter` to close the polygon.
+- **Object tool**: click two corners to draw a rectangle. Check Square in the side panel for equal sides. The side panel sets height and position X/Y/Z. The solid blocks sound and reflects it.
+- **Reflection order**: in the side panel, choose Direct, 1st, 2nd, or 3rd bounce.
 - **Speaker / Listener tools**: click in the 2D view to place.
 - **Move**: drag a speaker or listener marker, or edit Position X/Y in the inspector.
 - **A/B**: uncheck `Enabled` in the inspector, or remove the speaker.
@@ -70,7 +76,7 @@ npm run test:e2e
 - Direct field only. No reflections, room modes, diffuse field, or RT60.
 - Horizontal coverage only. Elevation, piston directivity, ports, EQ,
   phase, delay, and polarity are Phase 1 features.
-- Geometry is a single extruded room polygon. Objects, booleans, and
+- Solids are axis-aligned rectangles extruded in height. Booleans and
   imported assets are not implemented.
 - Levels are relative dB, not calibrated absolute SPL.
 - One project is persisted locally. There is no project browser, backend,

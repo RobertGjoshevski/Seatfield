@@ -1,15 +1,15 @@
-# Room Response Studio — v1 Design Spec
+# Seatfield — v1 Design Spec
 
 **Status:** Approved for planning  
 **Date:** 2026-11-11  
-**Working title:** Room Response Studio  
-**Project location:** `C:\Users\Robert\source\repos\room-response-studio`
+**Working title:** Seatfield  
+**Project location:** https://github.com/RobertGjoshevski/Seatfield
 
 ---
 
 ## 1. Summary
 
-Room Response Studio is a desktop-first, local-first web application for sketching a room or open space, extruding objects, placing one or more speakers, and comparing predicted acoustic behavior.
+Seatfield is a desktop-first, local-first web application for sketching a room or open space, extruding objects, placing one or more speakers, and comparing predicted acoustic behavior.
 
 The core loop is:
 
@@ -38,7 +38,7 @@ There is a gap for a tool that is:
 - Accessible from a browser with no installation.
 - Useful for both small rooms (studio, home theater) and open/PA spaces.
 
-Room Response Studio fills that gap by combining a deliberately simple 2.5D sketcher with a hybrid acoustic engine and a comparison-first workflow.
+Seatfield fills that gap by combining a deliberately simple 2.5D sketcher with a hybrid acoustic engine and a comparison-first workflow.
 
 ---
 
@@ -1783,8 +1783,8 @@ H_{total}(f)=\sum_s H_s(f)
 
 ## Appendix D — Decisions locked by this spec
 
-- Working title: **Room Response Studio**.
-- Project location: `C:\Users\Robert\source\repos\room-response-studio`.
+- Working title: **Seatfield**.
+- Project location: https://github.com/RobertGjoshevski/Seatfield.
 - Desktop-first; latest two versions of major browsers; WebGL2 + WASM.
 - Local-first; no backend or accounts in v1.
 - Standard hybrid solver is the v1 default.

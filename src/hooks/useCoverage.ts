@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react'
+import { coverageSpacingFor } from '../core/geometry/coverage'
+import { polygonBounds } from '../core/geometry/polygon'
 import { useProjectStore } from '../store/projectStore'
 import type {
   PreviewRequest,
@@ -10,9 +12,16 @@ export function useCoverage() {
   const requestIdRef = useRef(0)
 
   const boundary = useProjectStore((state) => state.project.room.boundary)
+  const roomHeight = useProjectStore((state) => state.project.room.height)
   const speakers = useProjectStore((state) => state.project.speakers)
+  const objects = useProjectStore((state) => state.project.objects)
   const listenerZ = useProjectStore((state) => state.project.listener.earHeight)
-  const spacing = useProjectStore((state) => state.coverageSpacing)
+  const roomKind = useProjectStore((state) => state.project.room.kind)
+  const resolutionMultiplier = useProjectStore(
+    (state) => state.resolutionMultiplier,
+  )
+  const frequencyHz = useProjectStore((state) => state.previewFrequencyHz)
+  const reflectionOrder = useProjectStore((state) => state.reflectionOrder)
   const previewNonce = useProjectStore((state) => state.previewNonce)
 
   useEffect(() => {
@@ -39,13 +48,22 @@ export function useCoverage() {
 
     requestIdRef.current += 1
     const requestId = requestIdRef.current
+    const spacing = coverageSpacingFor(
+      polygonBounds(boundary),
+      resolutionMultiplier,
+    ).spacing
     const request: PreviewRequest = {
       type: 'preview',
       requestId,
       boundary,
       spacing,
       listenerZ,
+      roomHeight,
+      frequencyHz,
       speakers,
+      objects,
+      reflectionOrder,
+      roomKind,
     }
 
     const handleMessage = (event: MessageEvent) => {
@@ -87,5 +105,16 @@ export function useCoverage() {
       worker.removeEventListener('message', handleMessage)
       worker.removeEventListener('error', handleError)
     }
-  }, [boundary, speakers, listenerZ, spacing, previewNonce])
+  }, [
+    boundary,
+    roomHeight,
+    speakers,
+    objects,
+    listenerZ,
+    roomKind,
+    resolutionMultiplier,
+    frequencyHz,
+    reflectionOrder,
+    previewNonce,
+  ])
 }

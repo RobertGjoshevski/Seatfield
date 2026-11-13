@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { SPEED_OF_SOUND_M_S } from '../../src/core/acoustics/roomField'
 import { ResultsPanel } from '../../src/components/layout/ResultsPanel'
 import {
   buildCoverageGrid,
@@ -23,6 +24,11 @@ const speaker: Speaker = {
   gainDb: 0,
   coverageHorizontalDeg: 180,
   radiatorDiameterM: 0.13,
+  widthM: 0.6,
+  depthM: 0.5,
+  heightM: 0.7,
+  phaseInverted: false,
+  delayMs: 0,
   enabled: true,
 }
 
@@ -37,7 +43,12 @@ describe('ResultsPanel', () => {
 
     const store = useProjectStore.getState()
     store.beginCoverage(1)
-    store.finishCoverage(1, computeCoverage(grid, [speaker]), 12, [])
+    store.finishCoverage(
+      1,
+      computeCoverage(grid, [speaker], { boundary, height: 3 }, 80),
+      12,
+      [],
+    )
 
     render(<ResultsPanel />)
 
@@ -55,5 +66,24 @@ describe('ResultsPanel', () => {
 
     expect(screen.getByTestId('coverage-status')).toHaveTextContent('Error')
     expect(screen.getByText('Worker failed')).toBeInTheDocument()
+  })
+
+  it('updates the listener level when the listener moves', () => {
+    const store = useProjectStore.getState()
+    store.updateRoom({ boundary, height: 2.5 })
+    store.addSpeaker({ x: 0.5, y: 0.5 })
+    store.setPreviewFrequencyHz(SPEED_OF_SOUND_M_S / 8)
+    store.setListener({ x: 0.2, y: 1.5 })
+
+    render(<ResultsPanel />)
+
+    const first = screen.getByTestId('listener-level').textContent
+    expect(first).not.toBe('—')
+
+    act(() => {
+      useProjectStore.getState().setListener({ x: 2, y: 1.5 })
+    })
+
+    expect(screen.getByTestId('listener-level').textContent).not.toBe(first)
   })
 })

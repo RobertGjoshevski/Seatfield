@@ -12,15 +12,15 @@ export function CoverageOverlay2D() {
 
   if (!grid || !imageUrl) return null
 
-  const width = (grid.nx - 1) * grid.spacing
-  const height = (grid.ny - 1) * grid.spacing
+  const width = grid.maxX - grid.minX
+  const height = grid.maxY - grid.minY
 
   return (
     <image
       data-testid="coverage-overlay-2d"
       href={imageUrl}
       x={grid.minX}
-      y={-(grid.minY + height)}
+      y={-grid.maxY}
       width={width}
       height={height}
       opacity={0.72}

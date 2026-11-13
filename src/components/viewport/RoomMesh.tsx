@@ -27,7 +27,7 @@ export function RoomMesh() {
         <shapeGeometry args={[shape]} />
         <meshStandardMaterial color="#0f1b24" side={THREE.DoubleSide} />
       </mesh>
-      {walls.map((wall, index) => (
+      {room.kind !== 'open' && walls.map((wall, index) => (
         <mesh
           key={index}
           position={[wall.center.x, wall.center.y, wall.center.z]}

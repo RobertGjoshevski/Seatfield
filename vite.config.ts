@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  base: process.env.GITHUB_PAGES === 'true' ? '/Seatfield/' : '/',
+  // Relative URLs work both at /Seatfield/ and at the custom domain root.
+  base: './',
   plugins: [react(), tailwindcss()],
 })
